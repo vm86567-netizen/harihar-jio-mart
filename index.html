@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harihar Jio Mart - E-commerce Store</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="nav-brand">🛒 Harihar Jio Mart</div>
+            <div class="nav-right">
+                <button class="nav-btn" onclick="showSection('products')">Shop</button>
+                <button class="nav-btn" onclick="showSection('cart')">Cart <span id="cartCount">0</span></button>
+                <button class="nav-btn" onclick="showSection('orders')">Orders</button>
+            </div>
+        </nav>
+
+        <!-- Products Section -->
+        <section id="products" class="section active">
+            <h1>Welcome to Harihar Jio Mart</h1>
+            <p class="subtitle">Fresh & Quality Products Delivered to Your Door</p>
+            
+            <div class="products-grid" id="productsGrid">
+                <!-- Products will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Cart Section -->
+        <section id="cart" class="section">
+            <h1>Shopping Cart</h1>
+            <div id="cartContainer">
+                <p class="empty-message">Your cart is empty</p>
+            </div>
+            <div id="checkoutBtn" style="display:none;">
+                <button class="btn btn-primary" onclick="goToCheckout()">Proceed to Checkout</button>
+            </div>
+        </section>
+
+        <!-- Orders Section -->
+        <section id="orders" class="section">
+            <h1>My Orders</h1>
+            <div id="ordersContainer">
+                <p class="empty-message">No orders yet</p>
+            </div>
+        </section>
+
+        <!-- Checkout Section -->
+        <section id="checkout" class="section">
+            <h1>Checkout</h1>
+            <form onsubmit="placeOrder(event)">
+                <input type="text" placeholder="Full Name" id="fullName" required>
+                <input type="email" placeholder="Email Address" id="email" required>
+                <input type="tel" placeholder="Phone Number" id="phone" required>
+                <input type="text" placeholder="Delivery Address" id="address" required>
+                
+                <label>Payment Method:</label>
+                <select id="paymentMethod" required>
+                    <option value="">Select Payment Method</option>
+                    <option value="Credit Card">Credit Card</option>
+                    <option value="Debit Card">Debit Card</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Net Banking">Net Banking</option>
+                </select>
+
+                <div class="order-summary">
+                    <h3>Order Summary</h3>
+                    <p>Total: ₹<span id="checkoutTotal">0</span></p>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Place Order</button>
+                <button type="button" class="btn btn-secondary" onclick="showSection('cart')">Back to Cart</button>
+            </form>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
