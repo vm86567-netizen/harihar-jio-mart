@@ -17,6 +17,22 @@ const products = [
 let cart = [];
 let orders = [];
 
+// Toast notification (replaces alert)
+let toastTimer = null;
+function showToast(message) {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        toast.className = 'toast';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     loadCart();
@@ -34,10 +50,12 @@ function displayProducts() {
         card.className = 'product-card';
         card.innerHTML = `
             <div class="product-image">${product.image}</div>
-            <h3>${product.name}</h3>
-            <p class="price">₹${product.price}</p>
-            <p class="category">${product.category}</p>
-            <button class="btn btn-add" onclick="addToCart(${product.id}, '${product.name}', ${product.price})">Add to Cart</button>
+            <div class="product-info">
+                <h3 class="product-name">${product.name}</h3>
+                <p class="price">₹${product.price}</p>
+                <p class="category">${product.category}</p>
+                <button class="btn btn-add" onclick="addToCart(${product.id}, '${product.name}', ${product.price})">Add to Cart</button>
+            </div>
         `;
         grid.appendChild(card);
     });
@@ -55,7 +73,7 @@ function addToCart(productId, name, price) {
     
     saveCart();
     updateCartCount();
-    alert(`✅ ${name} added to cart!`);
+    showToast(`✅ ${name} added to cart!`);
 }
 
 // Display Cart
@@ -80,7 +98,7 @@ function displayCart() {
                 <td>${item.name}</td>
                 <td>₹${item.price}</td>
                 <td>
-                    <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                    <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">−</button>
                     <span class="qty-display">${item.quantity}</span>
                     <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
                 </td>
@@ -144,10 +162,10 @@ function placeOrder(event) {
     orders.push(order);
     saveOrders();
     
-    alert(`✅ Order placed successfully!\nOrder ID: ${order.orderId}`);
+    showToast(`✅ Order ${order.orderId} placed successfully!`);
     
     // Clear form and cart
-    document.querySelector('form').reset();
+    document.querySelector('#checkout form').reset();
     cart = [];
     saveCart();
     updateCartCount();
@@ -236,3 +254,4 @@ function loadOrders() {
         orders = JSON.parse(saved);
     }
 }
+
