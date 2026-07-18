@@ -98,7 +98,7 @@ function displayCart() {
                 <td>${item.name}</td>
                 <td>₹${item.price}</td>
                 <td>
-                    <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">−</button>
+                    <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
                     <span class="qty-display">${item.quantity}</span>
                     <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
                 </td>

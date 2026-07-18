@@ -787,9 +787,13 @@ body {
     margin-top: 10px;
 }
 
-/* Checkout form inputs (bare tags used in HTML) */
-#checkout input,
-#checkout select {
+.btn-mt {
+    margin-top: 10px;
+}
+
+/* Checkout form inputs */
+#checkout .form-group input,
+#checkout .form-group select {
     width: 100%;
     padding: 12px;
     margin-bottom: 16px;
@@ -800,8 +804,8 @@ body {
     display: block;
 }
 
-#checkout input:focus,
-#checkout select:focus {
+#checkout .form-group input:focus,
+#checkout .form-group select:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
