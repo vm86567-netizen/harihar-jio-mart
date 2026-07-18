@@ -34,10 +34,12 @@ function displayProducts() {
         card.className = 'product-card';
         card.innerHTML = `
             <div class="product-image">${product.image}</div>
-            <h3>${product.name}</h3>
-            <p class="price">₹${product.price}</p>
-            <p class="category">${product.category}</p>
-            <button class="btn btn-add" onclick="addToCart(${product.id}, '${product.name}', ${product.price})">Add to Cart</button>
+            <div class="product-info">
+                <div class="product-name">${product.name}</div>
+                <div class="product-description">${product.category}</div>
+                <div class="product-price">₹${product.price}</div>
+                <button class="add-to-cart-btn" onclick="addToCart(${product.id}, '${product.name}', ${product.price})">Add to Cart</button>
+            </div>
         `;
         grid.appendChild(card);
     });
@@ -70,27 +72,35 @@ function displayCart() {
     }
     
     let total = 0;
-    let html = '<table class="cart-table"><tr><th>Product</th><th>Price</th><th>Quantity</th><th>Total</th><th>Action</th></tr>';
+    let html = '<div class="cart-container"><div class="cart-items">';
     
     cart.forEach(item => {
         const itemTotal = item.price * item.quantity;
         total += itemTotal;
         html += `
-            <tr>
-                <td>${item.name}</td>
-                <td>₹${item.price}</td>
-                <td>
-                    <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
-                    <span class="qty-display">${item.quantity}</span>
-                    <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
-                </td>
-                <td>₹${itemTotal}</td>
-                <td><button class="btn btn-remove" onclick="removeFromCart(${item.id})">Remove</button></td>
-            </tr>
+            <div class="cart-item">
+                <div class="cart-item-details">
+                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-price">₹${item.price} each</div>
+                    <div class="cart-item-quantity">Subtotal: ₹${itemTotal}</div>
+                </div>
+                <div class="cart-item-actions">
+                    <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                    <span class="quantity-input">${item.quantity}</span>
+                    <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                    <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
+                </div>
+            </div>
         `;
     });
     
-    html += `</table><div class="cart-total"><h2>Total: ₹${total}</h2></div>`;
+    html += `</div>
+        <div class="cart-summary">
+            <div class="summary-row total">
+                <span>Total</span><span>₹${total}</span>
+            </div>
+        </div>
+    </div>`;
     cartContainer.innerHTML = html;
     checkoutBtn.style.display = 'block';
     document.getElementById('checkoutTotal').textContent = total;
@@ -164,25 +174,28 @@ function displayOrders() {
         return;
     }
     
-    let html = '';
+    let html = '<div class="orders-container"><div class="orders-list">';
     orders.forEach(order => {
         html += `
-            <div class="order-card">
-                <h3>Order ID: ${order.orderId}</h3>
-                <p><strong>Date:</strong> ${order.date}</p>
+            <div class="order-item">
+                <div class="order-header">
+                    <span class="order-id">${order.orderId}</span>
+                    <span class="order-date">${order.date}</span>
+                </div>
                 <p><strong>Customer:</strong> ${order.customer.name}</p>
                 <p><strong>Email:</strong> ${order.customer.email}</p>
                 <p><strong>Phone:</strong> ${order.customer.phone}</p>
                 <p><strong>Address:</strong> ${order.customer.address}</p>
-                <p><strong>Payment Method:</strong> ${order.payment}</p>
-                <h4>Items:</h4>
-                <ul>
+                <p><strong>Payment:</strong> ${order.payment}</p>
+                <ul class="order-items-list">
                     ${order.items.map(item => `<li>${item.name} x${item.quantity} = ₹${item.price * item.quantity}</li>`).join('')}
                 </ul>
-                <p class="order-total"><strong>Total: ₹${order.total}</strong></p>
+                <div class="order-total">Total: ₹${order.total}</div>
+                <span class="order-status">Confirmed</span>
             </div>
         `;
     });
+    html += '</div></div>';
     
     ordersContainer.innerHTML = html;
 }
