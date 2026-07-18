@@ -82,11 +82,11 @@ function displayCart() {
                 <div class="cart-item-details">
                     <div class="cart-item-name">${item.name}</div>
                     <div class="cart-item-price">₹${item.price} each</div>
-                    <div class="cart-item-quantity">Subtotal: ₹${itemTotal}</div>
+                    <div class="cart-item-subtotal">Subtotal: ₹${itemTotal}</div>
                 </div>
                 <div class="cart-item-actions">
                     <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
-                    <span class="quantity-input">${item.quantity}</span>
+                    <span class="quantity-display">${item.quantity}</span>
                     <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
                     <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
                 </div>
