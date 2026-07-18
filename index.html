@@ -14,6 +14,7 @@
             <div class="nav-right">
                 <button class="nav-btn" onclick="showSection('products')">Shop</button>
                 <button class="nav-btn" onclick="showSection('cart')">Cart <span id="cartCount">0</span></button>
+                <button class="nav-btn nav-btn-bulk" onclick="showSection('bulk')">📦 Bulk Order</button>
                 <button class="nav-btn" onclick="showSection('orders')">Orders</button>
             </div>
         </nav>
@@ -36,6 +37,64 @@
             </div>
             <div id="checkoutBtn" style="display:none;">
                 <button class="btn btn-primary" onclick="goToCheckout()">Proceed to Checkout</button>
+            </div>
+        </section>
+
+        <!-- Bulk Order Section -->
+        <section id="bulk" class="section">
+            <h1>📦 Bulk Order Panel</h1>
+            <p class="subtitle">Order in large quantities and enjoy wholesale discounts</p>
+
+            <div class="bulk-discount-info">
+                <h3>🏷️ Bulk Discount Tiers</h3>
+                <div class="discount-tiers">
+                    <div class="tier-card">
+                        <span class="tier-qty">10–19 units</span>
+                        <span class="tier-pct">5% OFF</span>
+                    </div>
+                    <div class="tier-card">
+                        <span class="tier-qty">20–49 units</span>
+                        <span class="tier-pct">10% OFF</span>
+                    </div>
+                    <div class="tier-card">
+                        <span class="tier-qty">50+ units</span>
+                        <span class="tier-pct">15% OFF</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bulk-products-grid" id="bulkProductsGrid">
+                <!-- Bulk product rows will be loaded here -->
+            </div>
+
+            <div id="bulkSummaryContainer" style="display:none;">
+                <div class="bulk-summary">
+                    <h3>Order Summary</h3>
+                    <div id="bulkSummaryItems"></div>
+                    <div class="bulk-summary-totals">
+                        <div class="bulk-row"><span>Subtotal:</span><span>₹<span id="bulkSubtotal">0</span></span></div>
+                        <div class="bulk-row discount-row"><span>Discount:</span><span>- ₹<span id="bulkDiscount">0</span></span></div>
+                        <div class="bulk-row total-row"><span>Total Payable:</span><span>₹<span id="bulkTotal">0</span></span></div>
+                    </div>
+                </div>
+
+                <form id="bulkOrderForm" onsubmit="placeBulkOrder(event)">
+                    <h3>Delivery &amp; Payment Details</h3>
+                    <input type="text" placeholder="Business / Full Name" id="bulkName" required>
+                    <input type="email" placeholder="Email Address" id="bulkEmail" required>
+                    <input type="tel" placeholder="Phone Number" id="bulkPhone" required>
+                    <input type="text" placeholder="Delivery Address" id="bulkAddress" required>
+                    <select id="bulkPayment" required>
+                        <option value="">Select Payment Method</option>
+                        <option value="Credit Card">Credit Card</option>
+                        <option value="Debit Card">Debit Card</option>
+                        <option value="UPI">UPI</option>
+                        <option value="Net Banking">Net Banking</option>
+                        <option value="NEFT/RTGS">NEFT/RTGS</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary btn-bulk-order">Place Bulk Order</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetBulkForm()">Clear All</button>
+                </form>
             </div>
         </section>
 

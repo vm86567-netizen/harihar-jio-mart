@@ -166,9 +166,12 @@ function displayOrders() {
     
     let html = '';
     orders.forEach(order => {
+        const isBulk = order.type === 'bulk';
+        const discountLine = isBulk && order.discount > 0
+            ? `<p><strong>Discount:</strong> ₹${order.discount}</p>` : '';
         html += `
-            <div class="order-card">
-                <h3>Order ID: ${order.orderId}</h3>
+            <div class="order-card${isBulk ? ' bulk-order-card' : ''}">
+                <h3>${isBulk ? '📦 Bulk ' : ''}Order ID: ${order.orderId}</h3>
                 <p><strong>Date:</strong> ${order.date}</p>
                 <p><strong>Customer:</strong> ${order.customer.name}</p>
                 <p><strong>Email:</strong> ${order.customer.email}</p>
@@ -179,6 +182,7 @@ function displayOrders() {
                 <ul>
                     ${order.items.map(item => `<li>${item.name} x${item.quantity} = ₹${item.price * item.quantity}</li>`).join('')}
                 </ul>
+                ${discountLine}
                 <p class="order-total"><strong>Total: ₹${order.total}</strong></p>
             </div>
         `;
@@ -210,8 +214,155 @@ function showSection(sectionId) {
         displayOrders();
     } else if (sectionId === 'products') {
         displayProducts();
+    } else if (sectionId === 'bulk') {
+        displayBulkProducts();
     }
 }
+
+// ─── BULK ORDER PANEL ────────────────────────────────────────────────────────
+
+function getBulkDiscount(totalUnits) {
+    if (totalUnits >= 50) return 0.15;
+    if (totalUnits >= 20) return 0.10;
+    if (totalUnits >= 10) return 0.05;
+    return 0;
+}
+
+function displayBulkProducts() {
+    const grid = document.getElementById('bulkProductsGrid');
+    grid.innerHTML = '';
+
+    products.forEach(product => {
+        const row = document.createElement('div');
+        row.className = 'bulk-product-row';
+        row.innerHTML = `
+            <div class="bulk-product-info">
+                <span class="bulk-product-image">${product.image}</span>
+                <div>
+                    <div class="bulk-product-name">${product.name}</div>
+                    <div class="bulk-product-category">${product.category}</div>
+                    <div class="bulk-product-price">₹${product.price} / unit</div>
+                </div>
+            </div>
+            <div class="bulk-qty-controls">
+                <button class="qty-btn" onclick="changeBulkQty(${product.id}, -1)">−</button>
+                <input type="number" id="bulkQty_${product.id}" value="0" min="0" class="bulk-qty-input"
+                    onchange="updateBulkSummary()">
+                <button class="qty-btn" onclick="changeBulkQty(${product.id}, 1)">+</button>
+            </div>
+            <div class="bulk-line-total" id="bulkLine_${product.id}">₹0</div>
+        `;
+        grid.appendChild(row);
+    });
+}
+
+function changeBulkQty(productId, delta) {
+    const input = document.getElementById('bulkQty_' + productId);
+    const newVal = Math.max(0, parseInt(input.value || 0) + delta);
+    input.value = newVal;
+    updateBulkSummary();
+}
+
+function updateBulkSummary() {
+    let subtotal = 0;
+    let totalUnits = 0;
+    let hasItems = false;
+
+    products.forEach(product => {
+        const input = document.getElementById('bulkQty_' + product.id);
+        const qty = parseInt(input.value) || 0;
+        const lineTotal = qty * product.price;
+        document.getElementById('bulkLine_' + product.id).textContent = '₹' + lineTotal;
+        subtotal += lineTotal;
+        totalUnits += qty;
+        if (qty > 0) hasItems = true;
+    });
+
+    const discountRate = getBulkDiscount(totalUnits);
+    const discountAmt = Math.round(subtotal * discountRate);
+    const total = subtotal - discountAmt;
+
+    document.getElementById('bulkSubtotal').textContent = subtotal;
+    document.getElementById('bulkDiscount').textContent = discountAmt + (discountRate > 0 ? ' (' + (discountRate * 100) + '%)' : '');
+    document.getElementById('bulkTotal').textContent = total;
+
+    const summaryContainer = document.getElementById('bulkSummaryContainer');
+    summaryContainer.style.display = hasItems ? 'block' : 'none';
+
+    // Build summary items list
+    let summaryHtml = '';
+    products.forEach(product => {
+        const qty = parseInt(document.getElementById('bulkQty_' + product.id).value) || 0;
+        if (qty > 0) {
+            summaryHtml += `<div class="bulk-row"><span>${product.image} ${product.name} × ${qty}</span><span>₹${qty * product.price}</span></div>`;
+        }
+    });
+    document.getElementById('bulkSummaryItems').innerHTML = summaryHtml;
+}
+
+function placeBulkOrder(event) {
+    event.preventDefault();
+
+    const items = [];
+    let subtotal = 0;
+    let totalUnits = 0;
+
+    products.forEach(product => {
+        const qty = parseInt(document.getElementById('bulkQty_' + product.id).value) || 0;
+        if (qty > 0) {
+            items.push({ id: product.id, name: product.name, price: product.price, quantity: qty });
+            subtotal += qty * product.price;
+            totalUnits += qty;
+        }
+    });
+
+    if (items.length === 0) {
+        alert('⚠️ Please add at least one product to place a bulk order.');
+        return;
+    }
+
+    const discountRate = getBulkDiscount(totalUnits);
+    const discountAmt = Math.round(subtotal * discountRate);
+    const total = subtotal - discountAmt;
+
+    const order = {
+        orderId: 'BULK-' + Date.now(),
+        type: 'bulk',
+        items: items,
+        subtotal: subtotal,
+        discount: discountAmt,
+        total: total,
+        customer: {
+            name: document.getElementById('bulkName').value,
+            email: document.getElementById('bulkEmail').value,
+            phone: document.getElementById('bulkPhone').value,
+            address: document.getElementById('bulkAddress').value
+        },
+        payment: document.getElementById('bulkPayment').value,
+        date: new Date().toLocaleString()
+    };
+
+    orders.push(order);
+    saveOrders();
+
+    alert(`✅ Bulk order placed successfully!\nOrder ID: ${order.orderId}\nTotal: ₹${total}${discountAmt > 0 ? '\nYou saved: ₹' + discountAmt : ''}`);
+    resetBulkForm();
+    showSection('orders');
+}
+
+function resetBulkForm() {
+    products.forEach(product => {
+        const input = document.getElementById('bulkQty_' + product.id);
+        if (input) input.value = 0;
+        const lineEl = document.getElementById('bulkLine_' + product.id);
+        if (lineEl) lineEl.textContent = '₹0';
+    });
+    const form = document.getElementById('bulkOrderForm');
+    if (form) form.reset();
+    document.getElementById('bulkSummaryContainer').style.display = 'none';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 // LocalStorage Functions
 function saveCart() {
